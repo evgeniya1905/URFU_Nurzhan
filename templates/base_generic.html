@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yindeed.com{% endblock title %}</title>
+    {% load static %}
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <style>
+    /* Обновленные стили только для навбара */
+    .top-navbar {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        padding: 0;
+    }
+    
+    .navbar {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    .navbar-brand {
+        font-weight: 700;
+        font-size: 1.25rem;
+        padding: 0.8rem 0;
+    }
+    
+    .navbar-nav {
+    display: flex;
+    align-items: center; /* Выравнивание по вертикали */
+    flex-wrap: nowrap; /* Запрет переноса на новую строку */
+    }
+
+    .nav-item {
+    margin: 0;
+    white-space: nowrap; /* Запрет переноса текста */
+    }
+
+    .nav-link {
+    padding: 1rem 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    color: #000000 !important;
+    }
+    
+    .nav-link:hover {
+        color: #4CAF50 !important;
+    }
+    
+    .nav-link.active {
+        font-weight: 600;
+    }
+    
+    /* Остальные стили остаются без изменений */
+    .dropdown-menu {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .welcome-message {
+        padding: 0.5rem 1rem;
+        margin-right: 1rem;
+        border-right: 1px solid #dee2e6;
+    }
+    
+    .main-content-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 25%, #FFC107 50%, #FF9800 75%, #FF5722 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .content-wrapper {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+        min-height: calc(100vh - 40px);
+    }
+    
+    @media (max-width: 768px) {
+        .welcome-message {
+            display: none;
+        }
+        .main-content-container {
+            padding: 0 10px;
+        }
+        .content-wrapper {
+            padding: 15px;
+        }
+    }
+</style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light top-navbar">
+    <div class="container-fluid navbar-container">  <!-- Добавлен контейнер -->
+        <a class="navbar-brand" href="{% url 'core:home' %}">Поиск стажировок</a>
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- Центрированное меню -->
+            <ul class="navbar-nav mx-auto">  <!-- mx-auto для центрирования -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'core:home' %}">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'job_catalog:all_jobs' %}">Стажировки</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'job_catalog:all_companies' %}">Компании</a>
+                </li>
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'job_applications:my_job_applications' %}">Мои заявки</a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <div class="d-flex align-items-center">
+                {% if request.user.is_authenticated %}
+                    <div class="welcome-message d-none d-md-block">
+                        <strong>{{ request.user.username }}</strong>
+                        {% if request.user.profile.organization %}
+                            ({{ request.user.profile.organization.employer_org_name }})
+                        {% endif %}
+                    </div>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="userMenu" data-toggle="dropdown">
+                            Меню
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            {% if is_job_poster %}
+                                <h6 class="dropdown-header">Для работодателей</h6>
+                                <a class="dropdown-item" href="{% url 'job_applications:employer_applications' %}">Предложения</a>
+                                <a class="dropdown-item" href="{% url 'job_catalog:create_job_posting' %}">Создать вакансию</a>
+                                <a class="dropdown-item" href="{% url 'job_catalog:company_details' company_id=request.user.profile.organization.id %}">Моя организация</a>
+                                <a class="dropdown-item" href="{% url 'core:leaving_organization' %}">Покинуть организацию</a>
+                            {% else %}
+                                <h6 class="dropdown-header">Стать работодателем</h6>
+                                <a class="dropdown-item" href="{% url 'core:claim_organization' %}">Откликнуться</a>
+                                <a class="dropdown-item" href="{% url 'job_catalog:create_organization' %}">Создать организацию</a>
+                            {% endif %}
+                            <div class="dropdown-divider"></div>
+                            <form action="{% url 'core:logout' %}" method="post" class="px-4 py-2">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link p-0">Выход</button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'core:login_start' %}" class="btn btn-outline-primary mr-2">Вход</a>
+                    <a href="{% url 'core:register' %}" class="btn btn-primary">Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content-container">
+        <div class="content-wrapper">
+            {% block content %}
+            <!-- Page content goes here -->
+            {% endblock content %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

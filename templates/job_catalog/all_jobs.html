@@ -1,0 +1,70 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Все вакансии</h2>
+    
+    <div class="row">
+        {% for job_posting in job_postings_list %}
+        <div class="col-12 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex flex-column flex-md-row">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title">
+                            <a href="{% url 'job_catalog:job_details' job_posting.id %}" class="text-decoration-none text-dark">
+                                {{ job_posting.title }}
+                            </a>
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <a href="{% url 'job_catalog:company_details' job_posting.organization.id %}" class="text-decoration-none">
+                                @ {{ job_posting.organization.employer_org_name }}
+                            </a>
+                        </h6>
+                    </div>
+                    
+                    <div class="d-flex flex-column justify-content-between ms-md-3" style="min-width: 200px;">
+                        <div>
+                            <span class="badge bg-success mb-2">  <!-- Изменён цвет бейджа на зелёный -->
+                                {% if job_posting.job_type %}{{ job_posting.get_job_type_display }}{% else %}Полная занятость{% endif %}
+                            </span>
+                            <div class="text-muted small">ID: {{ job_posting.id }}</div>
+                        </div>
+                        
+                        <a href="{% url 'job_catalog:job_details' job_posting.id %}" class="btn btn-success mt-2 align-self-start">  <!-- Изменён класс на btn-success -->
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 8px;
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .badge {
+        font-size: 0.9em;
+        padding: 5px 10px;
+    }
+    /* Дополнительные стили для зелёных элементов */
+    .btn-success {
+        background-color: #4CAF50;
+        border-color: #4CAF50;
+    }
+    .btn-success:hover {
+        background-color: #3e8e41;
+        border-color: #3e8e41;
+    }
+    .bg-success {
+        background-color: #4CAF50 !important;
+    }
+</style>
+{% endblock %}

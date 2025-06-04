@@ -1,0 +1,24 @@
+{% extends 'base_generic.html' %}  <!-- Replace with your actual base template name -->
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Расскажите о вашей организации</h1>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="employer_org_name">Название организации:</label>
+            <input type="text" class="form-control" id="employer_org_name" name="employer_org_name">
+        </div>
+        <div class="form-group">
+            <label for="employer_org_description_box">Описание вашей организации:</label>
+            <textarea class="form-control" id="employer_org_description_box" name="employer_org_description_box"></textarea>
+        </div>
+      <div class="form-group">
+          <label for="representative_claim_token">Представитель:</label>
+          <input type="text" class="form-control" id="representative_claim_token" name="representative_claim_token" style="width: 30%;" placeholder="Enter token">
+      </div>
+
+        <button type="submit" class="btn btn-primary">Принять</button>
+    </form>
+</div>
+{% endblock %}

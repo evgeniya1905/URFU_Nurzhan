@@ -1,0 +1,23 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Поданные заявки</h2>
+    {% for org, applications in applications_grouped.items %}
+        <br>
+        <br>
+        <!-- Make the company title a link to its details page -->
+        <h4>(<a href="{% url 'job_catalog:company_details' company_id=org.id %}">{{ org.employer_org_name }}</a>)</h4>
+        <ul>
+        {% for application in applications %}
+            <li>
+                <a href="{% url 'job_catalog:job_details' job_id=application.job_posting.id %}"><strong>{{ application.job_posting.title }}</strong></a>, applied {{ application.submit_date }}
+
+            </li>
+        {% endfor %}
+        </ul>
+    {% empty %}
+        <p>You have not applied for any jobs yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}
